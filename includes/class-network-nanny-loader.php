@@ -3,11 +3,11 @@
 /**
  * Register all actions and filters for the plugin
  *
- * @link       http://example.com
- * @since      1.0.0
+ * @link		https://github.com/cmcantrell/Network-Nanny
+ * @since		1.0.0
  *
- * @package    Plugin_Name
- * @subpackage Plugin_Name/includes
+ * @package		Network_Nanny
+ * @subpackage	Network_Nanny/includes
  */
 
 /**
@@ -17,11 +17,12 @@
  * the plugin, and register them with the WordPress API. Call the
  * run function to execute the list of actions and filters.
  *
- * @package    Plugin_Name
- * @subpackage Plugin_Name/includes
- * @author     Your Name <email@example.com>
- */
-class Plugin_Name_Loader {
+ * @since		1.0.0
+ * @package		Network_Nanny
+ * @subpackage	Network_Nanny/includes
+ * @author		Clinton Cantrell <https://github.com/cmcantrell>
+*/
+class Network_Nanny_Loader {
 
 	/**
 	 * The array of actions registered with WordPress.

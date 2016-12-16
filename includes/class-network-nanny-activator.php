@@ -3,11 +3,11 @@
 /**
  * Fired during plugin activation
  *
- * @link       http://example.com
+ * @link              https://github.com/cmcantrell/Network-Nanny
  * @since      1.0.0
  *
- * @package    Plugin_Name
- * @subpackage Plugin_Name/includes
+ * @package    Network_Nanny
+ * @subpackage Network_Nanny/includes
  */
 
 /**
@@ -16,11 +16,11 @@
  * This class defines all code necessary to run during the plugin's activation.
  *
  * @since      1.0.0
- * @package    Plugin_Name
- * @subpackage Plugin_Name/includes
- * @author     Your Name <email@example.com>
+ * @package    Network_Nanny
+ * @subpackage Network_Nanny/includes
+ * @author     Clinton Cantrell <https://github.com/cmcantrell>
  */
-class Plugin_Name_Activator {
+class Network_Nanny_Activator {
 
 	/**
 	 * Short Description. (use period)

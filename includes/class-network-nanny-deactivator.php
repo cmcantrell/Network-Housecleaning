@@ -3,11 +3,11 @@
 /**
  * Fired during plugin deactivation
  *
- * @link       http://example.com
- * @since      1.0.0
+ * @link		https://github.com/cmcantrell/Network-Nanny
+ * @since		1.0.0
  *
- * @package    Plugin_Name
- * @subpackage Plugin_Name/includes
+ * @package		Network_Nanny
+ * @subpackage	Network_Nanny/includes
  */
 
 /**
@@ -16,11 +16,11 @@
  * This class defines all code necessary to run during the plugin's deactivation.
  *
  * @since      1.0.0
- * @package    Plugin_Name
- * @subpackage Plugin_Name/includes
- * @author     Your Name <email@example.com>
+ * @package    Network_Nanny
+ * @subpackage Network_Nanny/includes
+ * @author     Clinton Cantrell <https://github.com/cmcantrell>
  */
-class Plugin_Name_Deactivator {
+class Network_Nanny_Deactivator {
 
 	/**
 	 * Short Description. (use period)
