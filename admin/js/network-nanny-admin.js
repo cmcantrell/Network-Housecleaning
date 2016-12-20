@@ -29,4 +29,12 @@
 	 * practising this, we should strive to set a better example in our own work.
 	 */
 
+let NetworkNanny	=	 {
+	
+	
+};
+
+NetworkNanny.prototype		= new Utilities();	 
+	 
+	 
 })( jQuery );

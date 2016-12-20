@@ -95,9 +95,8 @@ class Network_Nanny_Admin {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/network-nanny-admin.js', array( 'jquery' ), $this->version, false );
-
+		 wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/utilities.js', array(), $this->version, false );
+		 wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/network-nanny-admin.js', array( 'jquery' ), $this->version, false );
 	}
 	
 	/*
@@ -116,6 +115,80 @@ class Network_Nanny_Admin {
 			array($this,'network_nanny_index')
 		);
 	}
+	
+	/*
+		*
+		*
+		*
+		*
+	**/
+	public function register_settings(){
+		register_setting('network-nanny', 'network-nanny-options');
+		
+		add_settings_section(
+			'network-nanny-js-section',							// section identifier
+			__('JavaScript Network Settings', 'network-nanny-js'),			// title
+			array($this,'network_nanny_js_settings_section_callback'),			// callback
+			'network-nanny'										// display page
+		);
+		
+		add_settings_field(
+			'network_nanny_js_toggle', 							// field identifier
+			__('Enable JavaScript cleanup?', 'network-nanny-js'),						// Title
+			array($this,'network_nanny_js_toggle_callback'),	// callback function
+			'network-nanny',									// page
+			'network-nanny-js-section',							// section identifier
+			[
+				'label_for'					=> 'network_nanny_js_toggle',
+				'class'             		=> 'network-nanny-row',
+				'network-nanny-custom-data' => 'custom',
+			]													// args
+		);
+		
+		add_settings_field(
+			'network_nanny_js_compile', 							// field identifier
+			__('Begin Compiling...', 'network-nanny-js'),						// Title
+			array($this,'network_nanny_js_compile_callback'),	// callback function
+			'network-nanny',									// page
+			'network-nanny-js-section',							// section identifier
+			[
+				'label_for'					=> 'network_nanny_js_compile',
+				'class'             		=> 'network-nanny-row'
+			]													// args
+		);
+		
+		add_settings_field(
+			'network_nanny_js_compile_ui', 							// field identifier
+			__(null, 'network-nanny-js'),						// Title
+			array($this,'network_nanny_js_compile_ui_callback'),	// callback function
+			'network-nanny',									// page
+			'network-nanny-js-section',							// section identifier
+			[
+				'label_for'					=> 'network_nanny_js_compile_ui',
+				'class'             		=> 'network-nanny-row'
+			]													// args
+		);
+		
+		add_settings_section(
+			'network-nanny-css-section',							// section identifier
+			__('CSS Network Settings', 'network-nanny-css'),			// title
+			array($this,'network_nanny_css_settings_section_callback'),			// callback
+			'network-nanny'										// display page
+		);
+		
+		add_settings_field(
+			'network_nanny_css_toggle', 							// field identifier
+			__('Enable CSS cleanup?', 'network-nanny-css'),						// Title
+			array($this,'network_nanny_css_toggle_callback'),	// callback function
+			'network-nanny',									// page
+			'network-nanny-css-section',							// section identifier
+			[
+				'label_for'					=> 'network_nanny_css_toggle',
+				'class'             		=> 'network-nanny-row',
+				'network-nanny-custom-data' => 'custom',
+			]													// args
+		);
+	}
 
 	/*
 		*
@@ -128,7 +201,7 @@ class Network_Nanny_Admin {
 			return;
 		}
 		?>
-		<div class="wrap">
+		<div class="wrap" id="wrap-network-nanny-js-pane">
 			<h1><?= esc_html(get_admin_page_title()); ?></h1>
 			<form action="options.php" method="post">
 			<?php
@@ -142,37 +215,8 @@ class Network_Nanny_Admin {
 			?>
 			</form>
     	</div>
+    	
 		<?php
-	}
-	
-	/*
-		*
-		*
-		*
-		*
-	**/
-	public function register_settings(){
-		register_setting('network-nanny', 'network-nanny-options');
-		
-		add_settings_section(
-			'network-nanny-section',							// section identifier
-			__('JavaScript Network Settings', 'network-nanny'),			// title
-			array($this,'network_nanny_js_settings_section_callback'),			// callback
-			'network-nanny'										// display page
-		);
-		
-		add_settings_field(
-			'network_nanny_js_toggle', 							// field identifier
-			__('Enable JavaScript cleanup?', 'network-nanny'),						// Title
-			array($this,'network_nanny_js_toggle_callback'),	// callback function
-			'network-nanny',									// page
-			'network-nanny-section',							// section identifier
-			[
-				'label_for'					=> 'network_nanny_js_toggle',
-				'class'             		=> 'network-nanny-row',
-				'network-nanny-custom-data' => 'custom',
-			]													// args
-		);
 	}
 
 	/*
@@ -183,9 +227,10 @@ class Network_Nanny_Admin {
 	**/
 	function network_nanny_js_settings_section_callback($args){
 		return;
-		?>
-		<p id="<?= esc_attr($args['id']); ?>"><?= esc_html__('Follow the white rabbit.', 'network-nanny'); ?></p>
-		<?php
+	}
+	
+	function network_nanny_css_settings_section_callback($args){
+		return;
 	}
 	
 	/*
@@ -206,8 +251,55 @@ class Network_Nanny_Admin {
 				class="network-nanny-options[<?= esc_attr($args['label_for']); ?>]" 
 				data-custom="<?= esc_attr($args['network-nanny-custom-data']); ?>" 
 				value="1"
-				<?php echo isset($options[$args['label_for']]) && (int)$options[$args['label_for']] === 1 ? 'checked="true"' : ''; ?>"  
+				<?php echo isset($options[$args['label_for']]) && (int)$options[$args['label_for']] === 1 ? 'checked="true"' : ''; ?>  
 			/>
+		<?php	
+	}
+	
+	function network_nanny_css_toggle_callback($args){
+		$options = $this->options;
+		
+		// output the field
+		?>
+			<input 
+				type="checkbox" 
+				name="network-nanny-options[<?= esc_attr($args['label_for']); ?>]" 
+				id="network-nanny-options[<?= esc_attr($args['label_for']); ?>]" 
+				class="network-nanny-options[<?= esc_attr($args['label_for']); ?>]" 
+				data-custom="<?= esc_attr($args['network-nanny-custom-data']); ?>" 
+				value="1"
+				<?php echo isset($options[$args['label_for']]) && (int)$options[$args['label_for']] === 1 ? 'checked="true"' : ''; ?>  
+			/>
+		<?php	
+	}
+	
+	/*
+		*
+		*
+		*
+		*
+	**/
+	function network_nanny_js_compile_callback($args){
+		
+		// output the field
+		?>
+			<button data-action="networkNannyCompile" class="button button-secondary">Compile</button>
+		<?php	
+	}
+	
+	/*
+		*
+		*
+		*
+		*
+	**/
+	function network_nanny_js_compile_ui_callback($args){
+		
+		// output the field
+		?>
+			<div id="network-nanny-js-compile-ui" class="network-nanny-ui" data-action="updateNetworkNannyUI">
+				
+			</div>
 		<?php	
 	}
 	
