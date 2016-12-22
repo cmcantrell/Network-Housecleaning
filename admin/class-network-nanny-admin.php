@@ -95,8 +95,7 @@ class Network_Nanny_Admin {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-		 wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/utilities.js', array(), $this->version, false );
-		 wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/network-nanny-admin.js', array( 'jquery' ), $this->version, false );
+		 wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/network-nanny-admin.js', array( 'jquery' ), false, false );
 	}
 	
 	/*
@@ -201,7 +200,7 @@ class Network_Nanny_Admin {
 			return;
 		}
 		?>
-		<div class="wrap" id="wrap-network-nanny-js-pane">
+		<div class="wrap" id="network-nanny-ui">
 			<h1><?= esc_html(get_admin_page_title()); ?></h1>
 			<form action="options.php" method="post">
 			<?php
