@@ -24,7 +24,7 @@
  * Text Domain:       network-nanny
  * Domain Path:       /languages
  */
-
+ini_set('display_errors',1);
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
 	die;

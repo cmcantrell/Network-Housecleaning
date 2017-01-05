@@ -95,7 +95,13 @@ class Network_Nanny_Admin {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-		 wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/network-nanny-admin.js', array( 'jquery' ), false, false );
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/network-nanny-admin.js', array( 'jquery' ), false, false );
+		wp_localize_script( $this->plugin_name, '_networknanny', array('ajax_url'=>admin_url('admin-ajax.php')));
+	}
+
+	public function jscompile(){
+		echo "lemme smash";
+		die();
 	}
 	
 	/*
@@ -200,7 +206,7 @@ class Network_Nanny_Admin {
 			return;
 		}
 		?>
-		<div class="wrap" id="network-nanny-ui">
+		<div class="wrap network-nanny-ui">
 			<h1><?= esc_html(get_admin_page_title()); ?></h1>
 			<form action="options.php" method="post">
 			<?php
@@ -224,11 +230,11 @@ class Network_Nanny_Admin {
 		*
 		*
 	**/
-	function network_nanny_js_settings_section_callback($args){
+	public function network_nanny_js_settings_section_callback($args){
 		return;
 	}
 	
-	function network_nanny_css_settings_section_callback($args){
+	public function network_nanny_css_settings_section_callback($args){
 		return;
 	}
 	
@@ -238,7 +244,7 @@ class Network_Nanny_Admin {
 		*
 		*
 	**/
-	function network_nanny_js_toggle_callback($args){
+	public function network_nanny_js_toggle_callback($args){
 		$options = $this->options;
 		
 		// output the field
@@ -255,10 +261,8 @@ class Network_Nanny_Admin {
 		<?php	
 	}
 	
-	function network_nanny_css_toggle_callback($args){
+	public function network_nanny_css_toggle_callback($args){
 		$options = $this->options;
-		
-		// output the field
 		?>
 			<input 
 				type="checkbox" 
@@ -278,9 +282,7 @@ class Network_Nanny_Admin {
 		*
 		*
 	**/
-	function network_nanny_js_compile_callback($args){
-		
-		// output the field
+	public function network_nanny_js_compile_callback($args){
 		?>
 			<button data-action="networkNannyCompile" class="button button-secondary">Compile</button>
 		<?php	
@@ -292,9 +294,7 @@ class Network_Nanny_Admin {
 		*
 		*
 	**/
-	function network_nanny_js_compile_ui_callback($args){
-		
-		// output the field
+	public function network_nanny_js_compile_ui_callback($args){
 		?>
 			<div id="network-nanny-js-compile-ui" class="network-nanny-ui" data-action="updateNetworkNannyUI">
 				
