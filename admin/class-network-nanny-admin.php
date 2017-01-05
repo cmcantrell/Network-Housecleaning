@@ -284,7 +284,7 @@ class Network_Nanny_Admin {
 	**/
 	public function network_nanny_js_compile_callback($args){
 		?>
-			<button data-action="networkNannyCompile" class="button button-secondary">Compile</button>
+			<button data-action="networkNannyCompile" data-wpajax_action="jscompile" class="button button-secondary">Compile</button>
 		<?php	
 	}
 	

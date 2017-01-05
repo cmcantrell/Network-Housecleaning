@@ -111,8 +111,6 @@
 	return global.Utils = selector => new Utilities(selector);
 
 })(this || window); // babel doesn't like "this", transpiles to 'undefined'
-// call
-
 
 /*
 	*
@@ -121,8 +119,6 @@
 	*
 	*
 **/
-
-
 let NetworkNanny	=	 function(){
 	this.UIelement			= document.getElementById('network-nanny-js-compile-ui');
 	this.registerUIelements();
@@ -138,11 +134,12 @@ NetworkNanny.prototype.networkNannyCompile 		= function(e,t){
 	e.preventDefault();
 	this.UIelement.innerHTML			= "compiling files...";
 	nonce 								= jQuery(this).attr("data-nonce");
+	let action 							= this.getAjaxAction(t); 
 	jQuery.ajax({
 		url 		: _networknanny.ajax_url,
 		type 		: 'post',
 		data 		: {
-			action 		: 'jscompile'
+			action 		: action
 		},
 		done 		: function(){
 
@@ -151,6 +148,10 @@ NetworkNanny.prototype.networkNannyCompile 		= function(e,t){
 
 		}
 	});
+};
+
+NetworkNanny.prototype.getAjaxAction			= function(t){
+	return t.getAttribute('data-wpajax_action') || false;
 };
 
 jQuery(document).ready(function(){
