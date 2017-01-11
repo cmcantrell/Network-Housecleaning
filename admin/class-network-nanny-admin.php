@@ -100,7 +100,8 @@ class Network_Nanny_Admin {
 	}
 
 	public function jscompile(){
-		echo "lemme smash";
+		$script_compiler			= new Network_Nanny_Script();
+		print_r($script_compiler);
 		die();
 	}
 	
@@ -302,4 +303,83 @@ class Network_Nanny_Admin {
 		<?php	
 	}
 	
+}
+
+
+
+
+
+
+/*
+	*
+	*
+	*
+	*
+	*
+	*
+**/
+class Network_Nanny_Script extends Network_Nanny_Script_Base{
+	
+	public function __construct(){
+		$this->init();
+		$this->negotiate_dependencies();
+
+		return $this;
+	}
+}
+
+class Network_Nanny_Script_Base{
+	
+	public $wp_scripts;
+
+	protected function init(){
+		$this->helper 				= new Network_Nanny_Script_Helpers();
+		$this->scripts 				= $this->get_scripts();
+	}
+
+	private function get_scripts($extension = 'js'){
+		$wp_scripts;
+		switch($extension){
+			case 'js' : 
+				$wp_scripts		= wp_scripts();
+				break;
+			default :
+				return false;
+		}
+		$this->wp_scripts		= $wp_scripts;
+	}
+
+	/*
+		*
+		*	@description 		sorts scripts property by full depth dependencies
+		*
+		*
+		*
+	**/
+	protected function negotiate_dependencies(){
+		$dependencies	= array();
+		foreach( $this->wp_scripts->registered as $index=>$script ) :
+			$handle									= $script->handle;
+			$dependencies[$index] 					= isset($dependencies[$index]) ? $dependencies[$index] : array(
+				'handle' => $handle, 
+				'dependencies' => array()
+			);
+
+			echo $handle."<br/>";
+			echo "<pre>";
+			print_r($script);
+			echo "</pre>";
+			
+		endforeach;
+
+		// @debug
+		foreach( $this->wp_scripts->registered as $index=>$script ) :
+			// echo $script->handle."<br/>";
+		endforeach;
+	}
+
+}
+
+class Network_Nanny_Script_Helpers{
+
 }
