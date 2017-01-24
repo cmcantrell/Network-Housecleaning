@@ -106,7 +106,8 @@ class Network_Nanny_Admin {
 	}
 
 	public function jscompile(){
-		echo "Lemme Smash";
+		$request 		= new Network_Nanny_Script_Compiler();
+		echo json_encode($request->wp_scripts);
 		die();
 	}
 	
@@ -179,26 +180,6 @@ class Network_Nanny_Admin {
 				'class'             		=> 'network-nanny-row'
 			]													// args
 		);
-		
-		add_settings_section(
-			'network-nanny-css-section',							// section identifier
-			__('CSS Network Settings', 'network-nanny-css'),			// title
-			array($this,'network_nanny_css_settings_section_callback'),			// callback
-			'network-nanny'										// display page
-		);
-		
-		add_settings_field(
-			'network_nanny_css_toggle', 							// field identifier
-			__('Enable CSS cleanup?', 'network-nanny-css'),						// Title
-			array($this,'network_nanny_css_toggle_callback'),	// callback function
-			'network-nanny',									// page
-			'network-nanny-css-section',							// section identifier
-			[
-				'label_for'					=> 'network_nanny_css_toggle',
-				'class'             		=> 'network-nanny-row',
-				'network-nanny-custom-data' => 'custom',
-			]													// args
-		);
 	}
 
 	/*
@@ -219,6 +200,10 @@ class Network_Nanny_Admin {
 			array_push($this->notices, array('error'=>'success', 'message'=>'Database connected. You can start saving & managing profiles.'));
 			$this->status 			= true;
 		endif;
+
+		$iniMemory		= (int)ini_get('memory_limit');
+		$iniExecTime	= ini_get('max_execution_time');
+		array_push($this->notices, array('error'=>$iniMemory >= 256 ? 'success' : 'error','message'=>"Memory Limit: " . $iniMemory . "Mb"));
 
 		?>
 
@@ -262,10 +247,6 @@ class Network_Nanny_Admin {
 		return;
 	}
 	
-	public function network_nanny_css_settings_section_callback($args){
-		return;
-	}
-	
 	/*
 		*
 		*
@@ -289,21 +270,6 @@ class Network_Nanny_Admin {
 		<?php	
 	}
 	
-	public function network_nanny_css_toggle_callback($args){
-		$options = $this->options;
-		?>
-			<input 
-				type="checkbox" 
-				name="network-nanny-options[<?= esc_attr($args['label_for']); ?>]" 
-				id="network-nanny-options[<?= esc_attr($args['label_for']); ?>]" 
-				class="network-nanny-options[<?= esc_attr($args['label_for']); ?>]" 
-				data-custom="<?= esc_attr($args['network-nanny-custom-data']); ?>" 
-				value="1"
-				<?php echo isset($options[$args['label_for']]) && (int)$options[$args['label_for']] === 1 ? 'checked="true"' : ''; ?>  
-			/>
-		<?php	
-	}
-	
 	/*
 		*
 		*
@@ -312,7 +278,7 @@ class Network_Nanny_Admin {
 	**/
 	public function network_nanny_js_compile_callback($args){
 		?>
-			<button data-action="networkNannyCompile" data-wpajax_action="jscompile" class="button button-secondary">Compile</button>
+			<button data-action="networkNannyCompileGetAutoProfile" data-wpajax_action="jscompile" class="button button-secondary">Compile</button>
 		<?php	
 	}
 	
@@ -324,7 +290,7 @@ class Network_Nanny_Admin {
 	**/
 	public function network_nanny_js_compile_ui_callback($args){
 		?>
-			<div id="network-nanny-js-compile-ui" class="network-nanny-ui" data-action="updateNetworkNannyUI">
+			<div id="network-nanny-js-compile-ui" class="network-nanny-ui">
 				
 			</div>
 		<?php	

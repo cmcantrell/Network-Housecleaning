@@ -22,8 +22,26 @@
  */
 class Network_Nanny_Script_Compiler_Base{
 	
-	public function __construct(){
+	public $helper;
+
+	public $wp_scripts;
+
+	protected function init(){
 		$this->helper			= new Network_Nanny_Script_Compiler_Helper();
+		$this->scripts 				= $this->get_scripts();
+	}
+
+	private function get_scripts($extension = 'js'){
+		$wp_scripts;
+		switch($extension){
+			case 'js' : 
+				$wp_scripts		= wp_scripts();
+				break;
+			default :
+				return false;
+		}
+		$this->wp_scripts		= $wp_scripts->registered;
+		unset($wp_scripts);
 	}
 
 	/*
@@ -34,6 +52,7 @@ class Network_Nanny_Script_Compiler_Base{
 		*
 	**/
 	protected function negotiate_dependencies(){
+
 		set_time_limit(0);
 		$dependencies	= array();
 		foreach( $this->wp_scripts as $index=>$script ) :

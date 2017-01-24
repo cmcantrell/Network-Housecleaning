@@ -2,3 +2,14 @@
  * All of the CSS for your admin-specific functionality should be
  * included in this file.
  */
+
+table#network-nanny_script-profile-data-table td
+{
+	border:1px solid #ccc;
+	border-collapse: collapse;
+	padding: 5px 10px;
+}
+
+table#network-nanny_script-profile-data-table td .dashicons {
+	float: right;
+}

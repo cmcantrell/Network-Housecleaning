@@ -118,6 +118,11 @@ class Network_Nanny {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-network-nanny-public.php';
 
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-network-nanny-script-compiler-helper.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-network-nanny-script-compiler-base.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-network-nanny-script-compiler.php';
+
+
 		$this->loader = new Network_Nanny_Loader();
 	}
 

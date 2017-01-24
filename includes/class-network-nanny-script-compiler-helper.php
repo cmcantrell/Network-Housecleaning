@@ -21,7 +21,7 @@
  * @author     Clinton Cantrell <https://github.com/cmcantrell>
  */
 class Network_Nanny_Script_Compiler_Helper{
-	
+
 	public function getDependencies($dependency, $collection){
 		foreach( $collection as $index=>$data ){
 			if($dependency === $data['handle']){
