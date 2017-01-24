@@ -70,7 +70,7 @@ class Network_Nanny {
 
 		$this->plugin_name = 'network-nanny';
 		$this->version = '1.0.0';
-
+		$this->setup_resources();
 		$this->load_dependencies();
 		$this->set_locale();
 		$this->define_admin_hooks();
@@ -207,6 +207,40 @@ class Network_Nanny {
 	 */
 	public function get_version() {
 		return $this->version;
+	}
+
+	/**
+	 * Retrieve the version number of the plugin.
+	 *
+	 * @since     1.0.0
+	 * @return    string    boolean.
+	 */
+	public function setup_resources() {
+		include(plugin_dir_path( __FILE__ ).'/test-script.php');
+		// create database tables
+		global $wpdb;
+		$table_name = $wpdb->prefix . "networknanny_networkprofiles";
+		
+		if($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) :
+			$charset_collate = $wpdb->get_charset_collate();
+			$sql = "CREATE TABLE $table_name (
+				id mediumint(9) NOT NULL AUTO_INCREMENT,
+				time datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+				name tinytext NOT NULL,
+				text text NOT NULL,
+				PRIMARY KEY  (id)
+			) $charset_collate;";
+			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+			dbDelta( $sql );
+			add_option( "networknanny_db_version", $this->version );
+
+			if($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name):
+				return true;
+			endif;
+			return false;
+		else:
+			return true;
+		endif;
 	}
 
 }

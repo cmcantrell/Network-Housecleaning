@@ -141,6 +141,7 @@ NetworkNanny.prototype.networkNannyCompile 		= function(e,t){
 		data 		: {
 			action 		: action
 		},
+		timeout 	: 10000000,
 		done 		: function(){
 
 		},

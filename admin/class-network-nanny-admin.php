@@ -41,6 +41,8 @@ class Network_Nanny_Admin {
 	 */
 	private $version;
 
+	private $notices;
+
 	/**
 	 * Initialize the class and set its properties.
 	 *
@@ -51,7 +53,11 @@ class Network_Nanny_Admin {
 	public function __construct( $plugin_name, $version ) {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
+		$this->notices = array();
 		$this->options = get_option('network-nanny-options');
+
+
+		// $script_compiler			= new Network_Nanny_Script();
 	}
 
 	/**
@@ -100,8 +106,7 @@ class Network_Nanny_Admin {
 	}
 
 	public function jscompile(){
-		$script_compiler			= new Network_Nanny_Script();
-		print_r($script_compiler);
+		echo "Lemme Smash";
 		die();
 	}
 	
@@ -205,8 +210,30 @@ class Network_Nanny_Admin {
 	public function network_nanny_index(){
 		if (!current_user_can('manage_options')) {
 			return;
-		}
+		} 
+		global $wpdb;
+		$table_name = $wpdb->prefix . "networknanny_networkprofiles";
+		if($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) :
+			array_push($this->notices, array('error'=>'error', 'message'=>'Database table \'networknanny_networkprofiles\' could not be found.  No network profiles can be saved. Deactivate and reactive the plugin, ensure you have proper database permissions or check your error logs for more information.'));
+		else:
+			array_push($this->notices, array('error'=>'success', 'message'=>'Database connected. You can start saving & managing profiles.'));
+			$this->status 			= true;
+		endif;
+
 		?>
+
+		<?php
+		if(count($this->notices)>0) :
+			foreach($this->notices as $notice) :
+		?>
+		<div class="notice notice-<?php _e($notice['error']); ?> is-dismissible">
+			<p><?php _e( $notice['message']); ?></p>
+		</div>
+		<?php
+			endforeach;
+		endif;
+		?>
+
 		<div class="wrap network-nanny-ui">
 			<h1><?= esc_html(get_admin_page_title()); ?></h1>
 			<form action="options.php" method="post">
@@ -303,83 +330,4 @@ class Network_Nanny_Admin {
 		<?php	
 	}
 	
-}
-
-
-
-
-
-
-/*
-	*
-	*
-	*
-	*
-	*
-	*
-**/
-class Network_Nanny_Script extends Network_Nanny_Script_Base{
-	
-	public function __construct(){
-		$this->init();
-		$this->negotiate_dependencies();
-
-		return $this;
-	}
-}
-
-class Network_Nanny_Script_Base{
-	
-	public $wp_scripts;
-
-	protected function init(){
-		$this->helper 				= new Network_Nanny_Script_Helpers();
-		$this->scripts 				= $this->get_scripts();
-	}
-
-	private function get_scripts($extension = 'js'){
-		$wp_scripts;
-		switch($extension){
-			case 'js' : 
-				$wp_scripts		= wp_scripts();
-				break;
-			default :
-				return false;
-		}
-		$this->wp_scripts		= $wp_scripts;
-	}
-
-	/*
-		*
-		*	@description 		sorts scripts property by full depth dependencies
-		*
-		*
-		*
-	**/
-	protected function negotiate_dependencies(){
-		$dependencies	= array();
-		foreach( $this->wp_scripts->registered as $index=>$script ) :
-			$handle									= $script->handle;
-			$dependencies[$index] 					= isset($dependencies[$index]) ? $dependencies[$index] : array(
-				'handle' => $handle, 
-				'dependencies' => array()
-			);
-
-			echo $handle."<br/>";
-			echo "<pre>";
-			print_r($script);
-			echo "</pre>";
-			
-		endforeach;
-
-		// @debug
-		foreach( $this->wp_scripts->registered as $index=>$script ) :
-			// echo $script->handle."<br/>";
-		endforeach;
-	}
-
-}
-
-class Network_Nanny_Script_Helpers{
-
 }
