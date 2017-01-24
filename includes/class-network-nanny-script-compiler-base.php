@@ -1,0 +1,99 @@
+<?php
+
+/**
+ * Fired during plugin activation
+ *
+ * @link              https://github.com/cmcantrell/Network-Nanny
+ * @since      1.0.0
+ *
+ * @package    Network_Nanny
+ * @subpackage Network_Nanny/includes
+ */
+
+/**
+ * Fired during plugin activation.
+ *
+ * This class defines all code necessary to run during the plugin's activation.
+ *
+ * @since      1.0.0
+ * @package    Network_Nanny
+ * @subpackage Network_Nanny/includes
+ * @author     Clinton Cantrell <https://github.com/cmcantrell>
+ */
+class Network_Nanny_Script_Compiler_Base{
+	
+	public function __construct(){
+		$this->helper			= new Network_Nanny_Script_Compiler_Helper();
+	}
+
+	/*
+		*
+		*	@description 		sorts scripts property by full depth dependencies
+		*
+		*
+		*
+	**/
+	protected function negotiate_dependencies(){
+		set_time_limit(0);
+		$dependencies	= array();
+		foreach( $this->wp_scripts as $index=>$script ) :
+			$handle									= $script->handle;
+			$dependencies[$index] 					= isset($dependencies[$index]) ? $dependencies[$index] : array(
+				'handle' => $handle, 
+				'dependencies' => array()
+			);
+			// add handle and dependencies to locally scoped dependencies array
+			foreach($script->deps as $i=>$dependency){
+				$dependencies[$index]['dependencies'][] = $dependency;
+			}
+		endforeach;
+
+		foreach( $dependencies as $index=>$data ){
+			$fullDependencies		= array();
+			foreach($dependencies as $i=>$dependency){
+			 	$fullDependencies[]		= $this->helper->getWithDependencies($dependency['handle'], $dependencies);
+			}
+		}
+		unset($dependencies);
+		$_fullDependencies = $fullDependencies;
+		foreach( $fullDependencies as $index=>$data ){
+			$this->helper->sortDependency($data,$_fullDependencies);
+		}
+		$fullDependencies = $_fullDependencies;
+		$_fullDependencies			= array();
+
+		// make sure jquery is first and foremost
+		$jquery 		= false;
+		$jqueryCore		= false;
+		$keys			= array('jqueryCore','jqueryMigrate','jquery');
+		foreach( $fullDependencies as $i=>$dependency ){
+			$handle = $this->helper->normalizeHandle($dependency['handle']);
+			if(in_array($handle, $keys)){
+				$$handle = $fullDependencies[$i];
+			}
+		}
+		foreach($keys as $k=>$key){
+			foreach( $fullDependencies as $i=>$dependency ){
+				if( $this->helper->normalizeHandle($dependency['handle']) === $key ){
+					$this->helper->moveArrayElement($fullDependencies, $i, $k);
+				}
+			}
+		}
+		foreach( $fullDependencies as $k=>$dependency ){
+			foreach($this->wp_scripts as $i=>$script){
+				if($dependency['handle'] === $script->handle){
+					$_fullDependencies[] = $script;
+					break;
+				}
+			}
+			
+		}
+		unset($fullDependencies);
+		$this->wp_scripts		= $_fullDependencies;
+		unset($_fullDependencies);
+		return true;
+	}
+	
+}
+
+?>

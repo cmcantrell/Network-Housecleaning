@@ -20,10 +20,13 @@
  * @subpackage Network_Nanny/includes
  * @author     Clinton Cantrell <https://github.com/cmcantrell>
  */
-class Network_Nanny_Script_Compiler{
+class Network_Nanny_Script_Compiler extends Network_Nanny_Script_Compiler_Base{
 	
 	public function __construct(){
-		$scriptsInit		= new Network_Nanny_Scripts();
+		ini_set('max_execution_time',0);
+		$this->init();
+		$this->negotiate_dependencies();
+		return $this;
 	}
 	
 }

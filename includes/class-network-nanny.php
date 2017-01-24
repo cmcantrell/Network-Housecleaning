@@ -216,7 +216,7 @@ class Network_Nanny {
 	 * @return    string    boolean.
 	 */
 	public function setup_resources() {
-		include(plugin_dir_path( __FILE__ ).'/test-script.php');
+		// include(plugin_dir_path( __FILE__ ).'/test-script.php');
 		// create database tables
 		global $wpdb;
 		$table_name = $wpdb->prefix . "networknanny_networkprofiles";
