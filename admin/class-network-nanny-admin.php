@@ -110,6 +110,52 @@ class Network_Nanny_Admin {
 		echo json_encode($request->wp_scripts);
 		die();
 	}
+
+	public function saveProfile(){
+		global $wpdb;
+		$table_name = $wpdb->prefix . "networknanny_networkprofiles";
+		if($wpdb->get_var("SHOW TABLES LIKE '$table_name'") === $table_name && isset($_REQUEST['profile'])):
+			
+			foreach($_REQUEST['profile'] as $name=>$profile):
+
+				$existingData = $wpdb->get_row( "SELECT id FROM ".$table_name." WHERE name='".$name."'", ARRAY_N );
+				if($existingData):
+					echo json_encode($existingData);
+					// $wpdb->update( 
+					// 	$table_name, 
+					// 	array( 
+					// 		'time' => current_time( 'mysql' ), 
+					// 		'name' => $name, 
+					// 		'text' => serialize($profile), 
+					// 	),
+					// 	$where, 
+					// 	$format = null, 
+					// 	$where_format = null 
+					// );
+				else:
+					$dbInsert	= $wpdb->insert( 
+				 		$table_name, 
+						array( 
+							'time' => current_time( 'mysql' ), 
+							'name' => $name, 
+							'text' => serialize($profile), 
+						)
+					);
+					if($dbInsert):
+						$response[] 		= array("error"=>"success","message"=>"data for ".$name." successfully created.");
+					endif;
+
+				endif;
+
+
+				
+			endforeach;
+			echo json_encode($response);
+		else:
+			echo json_encode(array("error"=>"could not resolve required database resources."));
+		endif;
+		die();
+	}
 	
 	/*
 		*

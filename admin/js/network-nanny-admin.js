@@ -126,7 +126,7 @@
 let NetworkNanny	=	 function(){
 	this.UIelement			= document.getElementById('network-nanny-js-compile-ui');
 	this.registerUIelements();
-	this.profile;
+	this.profile  		 	= {};
 };
 
 NetworkNanny.prototype.registerUIelements		= function(){
@@ -135,8 +135,6 @@ NetworkNanny.prototype.registerUIelements		= function(){
 
 NetworkNanny.prototype.networkNannyCompileGetAutoProfile 		= function(e,t){
 	console.log('@NetworkNanny.networkNannyCompile()');
-	e.stopPropagation();
-	e.preventDefault();
 	this.updateNetworkNannyUI("<b>compiling files...</b>");
 	t.disabled = true;
 	nonce 								= jQuery(this).attr("data-nonce");
@@ -147,21 +145,29 @@ NetworkNanny.prototype.networkNannyCompileGetAutoProfile 		= function(e,t){
 		type 		: 'post',
 		context 	: self,
 		data 		: {
-			action 		: action
+			action 		: action,
+			nonce 		: nonce
 		},
 		timeout 	: 0
 
 	}).done(function(response){
 		if(response){
-			self.profile 				= response;
-			let	res 						= JSON.parse(response),
-				htmlOut						= '<div id="network-nanny_script-profile"><b>Retrieved automated script profile.</b><p>This is an automated list of your scripts ordered by dependencies. Press save to compile your scripts and use this profile.</p>';
-				htmlOut						+= '<table id="network-nanny_script-profile-data-table">';
-			for( let index in res ){
-				htmlOut 		+= `<tr><td data-index="${index}">${res[index]['handle']}<span class="dashicons dashicons-sort"></span></td></tr>`;
+			if(JSON.parse(response)){
+				let res 						= JSON.parse(response),
+					htmlOut						= '<div id="network-nanny_script-profile"><b>Retrieved automated script profile.</b><p>This is an automated list of your scripts ordered by dependencies. Press save to compile your scripts and use this profile.</p>';
+					htmlOut 					+= '<button id="fuck-off" data-action="saveScriptProfile" data-wpajax_action="saveProfile">Use Profile</button>';
+					htmlOut						+= '<table id="network-nanny_script-profile-data-table">';
+				self.profile[action] 			= res;
+				for( let index in res ){
+					htmlOut 		+= `<tr><td data-index="${index}">${res[index]['handle']}<span class="dashicons dashicons-sort"></span></td></tr>`;
+				}
+				htmlOut							+= '</table></div>';
+				self.updateNetworkNannyUI(htmlOut);
+			}else{
+
 			}
-			htmlOut							+= '</table></div>';
-			self.updateNetworkNannyUI(htmlOut);
+		}else{
+
 		}
 	}).error(function(){
 		self.updateNetworkNannyUI('<b>Something went terribly wrong</b>');
@@ -172,8 +178,47 @@ NetworkNanny.prototype.networkNannyCompileGetAutoProfile 		= function(e,t){
 	});
 };
 
-NetworkNanny.prototype.saveScriptProfile		= function(){
+NetworkNanny.prototype.saveScriptProfile		= function(e,t){
 	console.log('NetworkNanny.saveScriptProfile()');
+	console.log(this.profile);
+	this.updateNetworkNannyUI("<b>Saving profiles...</b>");
+	t.disabled = true;
+	nonce 								= jQuery(this).attr("data-nonce");
+	let action 							= this.getAjaxAction(t),
+		self							= this;
+	jQuery.ajax({
+		url 		: _networknanny.ajax_url,
+		type 		: 'post',
+		context 	: self,
+		data 		: {
+			action 		: action,
+			profile 	: self.profile,
+			nonce 		: nonce
+		},
+		timeout 	: 0
+
+	}).done(function(response){
+		if(response){
+			let res 				= JSON.parse(response),
+				UImessage			= "<ul>";
+			if(res){
+				console.log(res);
+				for(let index in res){
+					UImessage 		+= `<li>${res[index]['error']}: ${res[index]['message']}</li>`;
+				}
+			}
+			UImessage			+= "</ul>";
+			self.updateNetworkNannyUI(UImessage);
+		}else{
+
+		}
+	}).error(function(){
+		self.updateNetworkNannyUI('<b>Something went terribly wrong</b>');
+	}).fail(function(){
+		self.updateNetworkNannyUI('<b>Something went terribly wrong</b>');
+	}).always(function() {
+		t.disabled = false;
+	});
 }
 
 NetworkNanny.prototype.updateNetworkNannyUI 	= function(data){
