@@ -51,11 +51,11 @@ class Network_Nanny_Admin {
 	 * @param      string    $version    The version of this plugin.
 	 */
 	public function __construct( $plugin_name, $version ) {
-		$this->plugin_name = $plugin_name;
-		$this->version = $version;
-		$this->notices = array();
-		$this->options = get_option('network-nanny-options');
-
+		$this->plugin_name 	= $plugin_name;
+		$this->version 		= $version;
+		$this->notices 		= array();
+		$this->options 		= get_option('network-nanny-options');
+		$this->profiles		= $this->get_profiles();
 
 		// $script_compiler			= new Network_Nanny_Script();
 	}
@@ -111,6 +111,18 @@ class Network_Nanny_Admin {
 		die();
 	}
 
+	private function get_profiles(){
+		$profiles 		= false;
+		global $wpdb;
+		$table_name = $wpdb->prefix . "networknanny_networkprofiles";
+		if($wpdb->get_var("SHOW TABLES LIKE '$table_name'") === $table_name) :
+			$profileData		= $wpdb->get_row( "SELECT * FROM ".$table_name, ARRAY_N );
+			echo "<pre>";
+			print_r($profileData);
+			echo "</pre>";
+		endif;
+	}
+
 	public function saveProfile(){
 		global $wpdb;
 		$table_name = $wpdb->prefix . "networknanny_networkprofiles";
@@ -120,18 +132,19 @@ class Network_Nanny_Admin {
 
 				$existingData = $wpdb->get_row( "SELECT id FROM ".$table_name." WHERE name='".$name."'", ARRAY_N );
 				if($existingData):
-					echo json_encode($existingData);
-					// $wpdb->update( 
-					// 	$table_name, 
-					// 	array( 
-					// 		'time' => current_time( 'mysql' ), 
-					// 		'name' => $name, 
-					// 		'text' => serialize($profile), 
-					// 	),
-					// 	$where, 
-					// 	$format = null, 
-					// 	$where_format = null 
-					// );
+					$profileId		= $existingData[0];
+					$update = $wpdb->update( 
+					 	$table_name, 
+					 	array( 
+					 		'time' => current_time( 'mysql' ), 
+					 		'name' => $name, 
+					 		'text' => serialize($profile), 
+					 	),
+					 	array( 'id' => $profileId )
+					);
+					if($update):
+						$response[]	 		= array("error"=>"success","message"=>"profile for ".$name." succesfully updated.");
+					endif;
 				else:
 					$dbInsert	= $wpdb->insert( 
 				 		$table_name, 
@@ -142,7 +155,7 @@ class Network_Nanny_Admin {
 						)
 					);
 					if($dbInsert):
-						$response[] 		= array("error"=>"success","message"=>"data for ".$name." successfully created.");
+						$response[] 		= array("error"=>"success","message"=>"profile for ".$name." successfully created.");
 					endif;
 
 				endif;
