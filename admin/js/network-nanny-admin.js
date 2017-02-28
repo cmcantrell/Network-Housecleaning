@@ -227,12 +227,11 @@ NetworkNanny.prototype.saveScriptProfile		= function(e,t){
 	});
 }
 
-NetworkNanny.prototype.updateNetworkNannyUI 	= function(data){
+NetworkNanny.prototype.updateNetworkNannyUI 	= function(data, UI = this.UIelement){
 	if(!data){
 		console.log('no data to UI update');
 		return false;
 	}
-	let UI 					= this.UIelement;
 	UI.innerHTML			= data;
 }
 

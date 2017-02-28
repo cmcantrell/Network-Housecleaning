@@ -274,8 +274,14 @@ class Network_Nanny_Admin {
 					$jsprofile 		= true;
 					?>
 					<script>
-					NetworkNanny.jscompile 	= <?php echo json_encode($profile[3]); ?>;
-					// NetworkNanny.updateNetworkNannyUI(NetworkNanny.buildCompileResponseHTML(NetworkNanny.jscompile));
+						jQuery(document).ready(function(){
+							if(typeof NetworkNanny !== undefined){
+								let nanny 				= new NetworkNanny();
+								nanny.jscompile  		= <?php echo json_encode(unserialize($profile[3])); ?>;
+								console.log(document.getElementById('network-nanny-js-compile-ui'));
+								nanny.updateNetworkNannyUI(nanny.buildCompileResponseHTML(nanny.jscompile), document.getElementById('network-nanny-js-compile-ui'));
+							}
+						});
 					</script>
 					<?php
 				}
