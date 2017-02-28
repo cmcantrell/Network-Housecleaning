@@ -153,16 +153,9 @@ NetworkNanny.prototype.networkNannyCompileGetAutoProfile 		= function(e,t){
 	}).done(function(response){
 		if(response){
 			if(JSON.parse(response)){
-				let res 						= JSON.parse(response),
-					htmlOut						= '<div id="network-nanny_script-profile"><b>Retrieved automated script profile.</b><p>This is an automated list of your scripts ordered by dependencies. Press save to compile your scripts and use this profile.</p>';
-					htmlOut 					+= '<button id="fuck-off" data-action="saveScriptProfile" data-wpajax_action="saveProfile">Use Profile</button>';
-					htmlOut						+= '<table id="network-nanny_script-profile-data-table">';
+				let res 						= JSON.parse(response);
 				self.profile[action] 			= res;
-				for( let index in res ){
-					htmlOut 		+= `<tr><td data-index="${index}">${res[index]['handle']}<span class="dashicons dashicons-sort"></span></td></tr>`;
-				}
-				htmlOut							+= '</table></div>';
-				self.updateNetworkNannyUI(htmlOut);
+				self.updateNetworkNannyUI(self.buildCompileResponseHTML(res));
 			}else{
 
 			}
@@ -177,6 +170,19 @@ NetworkNanny.prototype.networkNannyCompileGetAutoProfile 		= function(e,t){
 		t.disabled = false;
 	});
 };
+
+NetworkNanny.prototype.buildCompileResponseHTML = function(res){
+	let htmlOut;
+		htmlOut						= '<div id="network-nanny_script-profile"><b>Retrieved automated script profile.</b><p>This is an automated list of your scripts ordered by dependencies. Press save to compile your scripts and use this profile.</p>';
+		htmlOut 					+= '<button id="fuck-off" data-action="saveScriptProfile" data-wpajax_action="saveProfile">Use Profile</button>';
+		htmlOut						+= '<table id="network-nanny_script-profile-data-table">';
+	for( let index in res ){
+		//htmlOut 		+= `<tr><td data-index="${index}">${res[index]['handle']}<span class="dashicons dashicons-sort"></span></td></tr>`;
+		htmlOut 		+= `<tr><td data-index="${index}">${res[index]['handle']}</td></tr>`;
+	}
+	htmlOut							+= '</table></div>';
+	return htmlOut;
+}
 
 NetworkNanny.prototype.saveScriptProfile		= function(e,t){
 	console.log('NetworkNanny.saveScriptProfile()');
@@ -222,6 +228,10 @@ NetworkNanny.prototype.saveScriptProfile		= function(e,t){
 }
 
 NetworkNanny.prototype.updateNetworkNannyUI 	= function(data){
+	if(!data){
+		console.log('no data to UI update');
+		return false;
+	}
 	let UI 					= this.UIelement;
 	UI.innerHTML			= data;
 }

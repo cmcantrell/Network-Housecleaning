@@ -117,19 +117,18 @@ class Network_Nanny_Admin {
 		$table_name = $wpdb->prefix . "networknanny_networkprofiles";
 		if($wpdb->get_var("SHOW TABLES LIKE '$table_name'") === $table_name) :
 			$profileData		= $wpdb->get_row( "SELECT * FROM ".$table_name, ARRAY_N );
-			echo "<pre>";
-			print_r($profileData);
-			echo "</pre>";
+			if($profileData):
+				$profiles[] 			= $profileData;
+			endif;
 		endif;
+		return $profiles;
 	}
 
 	public function saveProfile(){
 		global $wpdb;
 		$table_name = $wpdb->prefix . "networknanny_networkprofiles";
 		if($wpdb->get_var("SHOW TABLES LIKE '$table_name'") === $table_name && isset($_REQUEST['profile'])):
-			
 			foreach($_REQUEST['profile'] as $name=>$profile):
-
 				$existingData = $wpdb->get_row( "SELECT id FROM ".$table_name." WHERE name='".$name."'", ARRAY_N );
 				if($existingData):
 					$profileId		= $existingData[0];
@@ -251,6 +250,7 @@ class Network_Nanny_Admin {
 		if (!current_user_can('manage_options')) {
 			return;
 		} 
+		// check database connection
 		global $wpdb;
 		$table_name = $wpdb->prefix . "networknanny_networkprofiles";
 		if($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) :
@@ -260,10 +260,28 @@ class Network_Nanny_Admin {
 			$this->status 			= true;
 		endif;
 
+		// check memory settings
 		$iniMemory		= (int)ini_get('memory_limit');
 		$iniExecTime	= ini_get('max_execution_time');
 		array_push($this->notices, array('error'=>$iniMemory >= 256 ? 'success' : 'error','message'=>"Memory Limit: " . $iniMemory . "Mb"));
 
+		// check for profiles
+		$profiles 		= $this->get_profiles();
+		$jsprofile		= false;
+		if($profiles):
+			foreach($profiles as $profile):
+				if($profile[2] === 'jscompile'){
+					$jsprofile 		= true;
+					?>
+					<script>
+					NetworkNanny.jscompile 	= <?php echo json_encode($profile[3]); ?>;
+					// NetworkNanny.updateNetworkNannyUI(NetworkNanny.buildCompileResponseHTML(NetworkNanny.jscompile));
+					</script>
+					<?php
+				}
+				array_push($this->notices, array('error'=>'warning', 'message'=>'You have a saved ' . $profile[2] . ' profile'));
+			endforeach;
+		endif;
 		?>
 
 		<?php
