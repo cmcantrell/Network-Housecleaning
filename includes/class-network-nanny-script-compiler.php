@@ -28,6 +28,11 @@ class Network_Nanny_Script_Compiler extends Network_Nanny_Script_Compiler_Base{
 		$this->negotiate_dependencies();
 		return $this;
 	}
+
+	public static function write(){
+		$request 			= new Network_Nanny_Script_Compiler();
+		$request->getFileHandle();
+	}
 	
 }
 

@@ -28,7 +28,7 @@ class Network_Nanny_Script_Compiler_Base{
 
 	protected function init(){
 		$this->helper			= new Network_Nanny_Script_Compiler_Helper();
-		$this->scripts 				= $this->get_scripts();
+		$this->scripts 			= $this->get_scripts();
 	}
 
 	private function get_scripts($extension = 'js'){
@@ -111,6 +111,10 @@ class Network_Nanny_Script_Compiler_Base{
 		$this->wp_scripts		= $_fullDependencies;
 		unset($_fullDependencies);
 		return true;
+	}
+
+	protected function getFileHandle(){
+		$handle 				= $this->helper->getFileHandle();
 	}
 	
 }

@@ -127,6 +127,7 @@ let NetworkNanny	=	 function(){
 	this.UIelement			= document.getElementById('network-nanny-js-compile-ui');
 	this.registerUIelements();
 	this.profile  		 	= {};
+	return this;
 };
 
 NetworkNanny.prototype.registerUIelements		= function(){

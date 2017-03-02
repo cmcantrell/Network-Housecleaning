@@ -91,7 +91,7 @@ class Network_Nanny_Script_Compiler_Helper{
 		return $set;
 	}
 
-	function sortDependency($data,&$collection){
+	public function sortDependency($data,&$collection){
 		foreach($collection as $index=>$inst){
 			if( $inst['handle'] === $data['handle'] && count($data['dependencies'])>0){
 				// iterate over each dependency
@@ -109,6 +109,10 @@ class Network_Nanny_Script_Compiler_Helper{
 				}
 			}
 		}
+	}
+
+	public function getFileHandle(){
+		return true;
 	}
 }
 

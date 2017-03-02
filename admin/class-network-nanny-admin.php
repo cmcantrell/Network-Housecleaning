@@ -125,9 +125,15 @@ class Network_Nanny_Admin {
 	}
 
 	public function saveProfile(){
+		$response 				= array();
+		if(!isset($_REQUEST['profile'])){
+			$response[] 		= array("error"=>"error","message"=>"no profile to update.");
+			echo json_encode($response);
+			die();
+		}
 		global $wpdb;
 		$table_name = $wpdb->prefix . "networknanny_networkprofiles";
-		if($wpdb->get_var("SHOW TABLES LIKE '$table_name'") === $table_name && isset($_REQUEST['profile'])):
+		if($wpdb->get_var("SHOW TABLES LIKE '$table_name'") === $table_name ):
 			foreach($_REQUEST['profile'] as $name=>$profile):
 				$existingData = $wpdb->get_row( "SELECT id FROM ".$table_name." WHERE name='".$name."'", ARRAY_N );
 				if($existingData):
@@ -158,13 +164,12 @@ class Network_Nanny_Admin {
 					endif;
 
 				endif;
-
-
-				
+				Network_Nanny_Script_Compiler::write($profile);
 			endforeach;
 			echo json_encode($response);
 		else:
-			echo json_encode(array("error"=>"could not resolve required database resources."));
+			$response[] 		= array("error"=>"error","message"=>"could not resolve required database resources.");
+			echo json_encode($response);
 		endif;
 		die();
 	}
@@ -276,10 +281,10 @@ class Network_Nanny_Admin {
 					<script>
 						jQuery(document).ready(function(){
 							if(typeof NetworkNanny !== undefined){
-								let nanny 				= new NetworkNanny();
-								nanny.jscompile  		= <?php echo json_encode(unserialize($profile[3])); ?>;
-								console.log(document.getElementById('network-nanny-js-compile-ui'));
-								nanny.updateNetworkNannyUI(nanny.buildCompileResponseHTML(nanny.jscompile), document.getElementById('network-nanny-js-compile-ui'));
+								
+								let jscompile  		= <?php echo json_encode(unserialize($profile[3])); ?>, 
+									uiEle 			= document.getElementById('network-nanny-js-compile-ui');
+								NetworkNanny.prototype.updateNetworkNannyUI(NetworkNanny.prototype.buildCompileResponseHTML(jscompile),uiEle);
 							}
 						});
 					</script>
