@@ -305,6 +305,19 @@ class Network_Nanny_Admin {
 		<?php
 			endforeach;
 		endif;
+
+		// echo "<pre>";
+		// print_r(wp_scripts()->registered);
+		// echo "</pre>";
+
+		foreach(wp_scripts()->registered as $script){
+			if(in_array($script->handle,wp_scripts()->queue)):
+				echo "<pre>";
+				print_r($script);
+				echo "</pre>";
+			endif;
+		}
+
 		?>
 
 		<div class="wrap network-nanny-ui">

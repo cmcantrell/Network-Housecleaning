@@ -35,6 +35,18 @@ class Network_Nanny_Script_Compiler_Base{
 		$wp_scripts;
 		switch($extension){
 			case 'js' : 
+				
+				echo "<pre>";
+				echo "jump, jump, jump";
+				print_r(wp_scripts()->queue);
+				echo "</pre>";
+
+				// foreach(wp_scripts()->registered as $script){
+				// 	if(in_array($script->handle,wp_scripts()->queue)):
+				// 		mail()
+				// 	endif;
+				// }
+
 				$wp_scripts		= wp_scripts();
 				break;
 			default :
