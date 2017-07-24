@@ -102,7 +102,23 @@ class Network_Nanny_Admin {
 		 * class.
 		 */
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/network-nanny-admin.js', array( 'jquery' ), false, false );
-		wp_localize_script( $this->plugin_name, '_networknanny', array('ajax_url'=>admin_url('admin-ajax.php')));
+		wp_localize_script( $this->plugin_name, '_networknanny', array('ajax_url'=>admin_url('admin-ajax.php'), 'registeredJSScripts'=>$this->getRegisteredFrontendScripts()));
+	}
+
+	private function getRegisteredFrontendScripts(){
+		// echo "<pre>";
+		// print_r(wp_scripts()->registered);
+		// echo "</pre>";
+		$registeredJSScripts 			 = array();
+		foreach(wp_scripts()->registered as $script){
+			if(in_array($script->handle,wp_scripts()->queue)):
+				$registeredJSScripts[] = $script;
+			endif;
+		}
+		// echo "<pre>";
+		// print_r($registeredJSScripts);
+		// echo "</pre>";
+		return $registeredJSScripts;
 	}
 
 	public function jscompile(){
@@ -269,7 +285,7 @@ class Network_Nanny_Admin {
 		$iniMemory		= (int)ini_get('memory_limit');
 		$iniExecTime	= ini_get('max_execution_time');
 		array_push($this->notices, array('error'=>$iniMemory >= 256 ? 'success' : 'error','message'=>"Memory Limit: " . $iniMemory . "Mb"));
-
+		
 		// check for profiles
 		$profiles 		= $this->get_profiles();
 		$jsprofile		= false;
@@ -305,18 +321,6 @@ class Network_Nanny_Admin {
 		<?php
 			endforeach;
 		endif;
-
-		// echo "<pre>";
-		// print_r(wp_scripts()->registered);
-		// echo "</pre>";
-
-		foreach(wp_scripts()->registered as $script){
-			if(in_array($script->handle,wp_scripts()->queue)):
-				echo "<pre>";
-				print_r($script);
-				echo "</pre>";
-			endif;
-		}
 
 		?>
 

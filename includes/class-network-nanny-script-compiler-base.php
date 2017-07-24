@@ -36,10 +36,10 @@ class Network_Nanny_Script_Compiler_Base{
 		switch($extension){
 			case 'js' : 
 				
-				echo "<pre>";
-				echo "jump, jump, jump";
-				print_r(wp_scripts()->queue);
-				echo "</pre>";
+				// echo "<pre>";
+				// echo "jump, jump, jump";
+				// print_r($_POST['data']);
+				// echo "</pre>";
 
 				// foreach(wp_scripts()->registered as $script){
 				// 	if(in_array($script->handle,wp_scripts()->queue)):

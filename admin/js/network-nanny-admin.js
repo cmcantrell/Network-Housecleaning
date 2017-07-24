@@ -147,7 +147,10 @@ NetworkNanny.prototype.networkNannyCompileGetAutoProfile 		= function(e,t){
 		context 	: self,
 		data 		: {
 			action 		: action,
-			nonce 		: nonce
+			nonce 		: nonce,
+			data 		: {
+				'js' 		: _networknanny.registeredJSScripts
+			}
 		},
 		timeout 	: 0
 
