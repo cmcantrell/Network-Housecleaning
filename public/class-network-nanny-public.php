@@ -124,7 +124,6 @@ class Network_Nanny_Public {
 			return;
 		endif;
 		
-		
 		// get current dependencies
 		foreach($wp_scripts->registered as $script){
 			if(in_array($script->handle, $wp_scripts->queue)){
@@ -139,8 +138,6 @@ class Network_Nanny_Public {
 						}
 					}
 				}
-				
-				// wp_dequeue_script($script->handle);
 				$script->in_footer 		= $in_footer;
 				// save handle in array to make searching easier
 				$scripts_stash_handle[] = $script->handle;
@@ -172,19 +169,43 @@ class Network_Nanny_Public {
 				}
 			}
 		}
+
 		$baseUrl 		= isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http' . ':\/\/' . $_SERVER['SERVER_NAME'];
 		$reqs 			= array();
+		$plugin_dir 	= ABSPATH . 'wp-content/plugins/Network-Nanny/';
+		$appJs 			= $plugin_dir.'public/js/app.js';
+		$script_data 	= array();
+		
 		foreach($scripts_stash_final as $script){
 			$handle 			= $script->handle;
 			$src 				= $script->src;
+
+			if(isset($script->extra)){
+				if(isset($script->extra['data']) && count($script->extra['data']) > 0){
+					$script_data[] 		= $script->extra['data'];
+				}
+			}
+
 			wp_dequeue_script($handle);
 			if(preg_match("/^(".$baseUrl.").*/i", $src)){
 				$src = preg_replace("/^(".$baseUrl.")/i", '', $src);
 			};
 			array_push($reqs, $src);
 		}
-		$plugin_dir = ABSPATH . 'wp-content/plugins/Network-Nanny/';
-		$appJs 		= $plugin_dir.'public/js/app.js';
+
+		if(count($script_data) > 0){
+			if($resource0 = fopen($plugin_dir.'public/js/data.js', 'w')){
+				$string 			= "";
+				foreach($script_data as $d){
+					$string 		.= $d;
+				}
+				fwrite($resource0, $string);
+				if(fclose($resource0)){
+					array_unshift($reqs, '/wp-content/plugins/Network-Nanny/public/js/data.js');
+				}
+			}				
+		}
+		
 		
 		if($resource = fopen($appJs, 'w')){
 			$string 			= "/*
@@ -197,13 +218,24 @@ class Network_Nanny_Public {
 			foreach($reqs as $req){
 				$string.="require('../../../../..".$req."');";
 			}
+
 			if(fwrite($resource,$string)){
 				if(fclose($resource)){
-					exec ('export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin; /Users/clinton/Sites/wordpress/wp-content/plugins/plugin-name/node_modules/.bin/webpack --config /Users/clinton/Sites/wordpress/wp-content/plugins/plugin-name/webpack.config.js ', $ret);
-
-					echo "<pre>";
-					print_r($ret);
-					echo "</pre>";
+					exec('echo $PATH', $path);
+					$path 				= $path[0];
+					exec('export PATH=/usr/local/bin:'.$path.'; /Users/clinton/Sites/wordpress/wp-content/plugins/Network-Nanny/node_modules/.bin/webpack --config /Users/clinton/Sites/wordpress/wp-content/plugins/Network-Nanny/webpack.config.js', $ret);
+					
+					if($errorLog = fopen($plugin_dir . 'logs/runtime.log', 'a')){
+						if(filesize($plugin_dir . 'logs/runtime.log') > 1000000000){
+							ftruncate($errorLog, 0);
+							fwrite($errorLog, date('Y-m-d H:i:s ') . PHP_EOL . 'File truncated' . PHP_EOL);
+						}
+						$log_data 		= date('Y-m-d H:i:s ') . PHP_EOL;
+						$log_data 		.= 'export PATH=/usr/local/bin:'.$path.'; /Users/clinton/Sites/wordpress/wp-content/plugins/Network-Nanny/node_modules/.bin/webpack --config /Users/clinton/Sites/wordpress/wp-content/plugins/Network-Nanny/webpack.config.js' . PHP_EOL;
+						$log_data 		.= print_r($ret, true);
+						fwrite($errorLog, $log_data);
+						fclose($errorLog);
+					}
 
 					wp_enqueue_script( 'webpack-bundle', plugin_dir_url( __FILE__ ).'/js/dist/bundle.js', array(), false, false );
 				}else{
@@ -217,25 +249,6 @@ class Network_Nanny_Public {
 		}else{
 			return false;
 		}
-
-		// var_dump($scripts_stash_final);
-		// /Users/clinton/Sites/wordpress/wp-content/plugins/plugin-name/node_modules/.bin/webpack
-		// 
-		//				                  /usr/bin:/bin:/usr/sbin:/sbin
-		// exec('echo $PATH', $path);
-		// echo "<pre>";
-		// print_r($path);
-		// echo "</pre>";			                  
-		
-		// exec ('export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin; /Users/clinton/Sites/wordpress/wp-content/plugins/plugin-name/node_modules/.bin/webpack --config /Users/clinton/Sites/wordpress/wp-content/plugins/plugin-name/webpack.config.js ', $ret);
-		
-		// echo "<pre>";
-		// print_r($ret);
-		// echo "</pre>";
-
-		// echo plugin_dir_url( __FILE__ );
-
-		// wp_enqueue_script( 'webpack-bundle', plugin_dir_url( __FILE__ ).'/js/dist/bundle.js', array(), false, false );
 	}
 
 }
