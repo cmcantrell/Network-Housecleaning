@@ -106,18 +106,12 @@ class Network_Nanny_Admin {
 	}
 
 	private function getRegisteredFrontendScripts(){
-		// echo "<pre>";
-		// print_r(wp_scripts()->registered);
-		// echo "</pre>";
 		$registeredJSScripts 			 = array();
 		foreach(wp_scripts()->registered as $script){
 			if(in_array($script->handle,wp_scripts()->queue)):
 				$registeredJSScripts[] = $script;
 			endif;
 		}
-		// echo "<pre>";
-		// print_r($registeredJSScripts);
-		// echo "</pre>";
 		return $registeredJSScripts;
 	}
 

@@ -1,0 +1,22 @@
+{
+  "name": "network-nanny",
+  "version": "1.0.0",
+  "description": "Wordpress network tab management",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --config webpack.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cmcantrell/Network-Nanny.git"
+  },
+  "author": "clinton@insightdesigns.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cmcantrell/Network-Nanny/issues"
+  },
+  "homepage": "https://github.com/cmcantrell/Network-Nanny#readme",
+  "dependencies": {
+    "webpack": "^3.5.5"
+  }
+}

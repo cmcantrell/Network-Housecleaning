@@ -73,7 +73,7 @@ class Network_Nanny_Public {
 		 * class.
 		 */
 
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/network-nanny-public.css', array(), $this->version, 'all' );
+		// wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/network-nanny-public.css', array(), $this->version, 'all' );
 
 	}
 
@@ -96,8 +96,146 @@ class Network_Nanny_Public {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/network-nanny-public.js', array( 'jquery' ), $this->version, false );
+		// wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/network-nanny-public.js', array( 'jquery' ), $this->version, false );
 
+	}
+
+	public function web_pack_init(){
+
+		global $wpdb;
+		global $wp_scripts;
+		$scripts_stash_handle 	= array();
+		$scripts_stash 			= array();
+		$scripts_stash_final 	= array();
+		$table_name 			= $wpdb->prefix . "networknanny_networkprofiles";
+		$profile_name 			= 'jscompile';
+
+		// pull saved profile
+		if($wpdb->get_var("SHOW TABLES LIKE '".$table_name."'") === $table_name ):
+			$existing_data = $wpdb->get_row( "SELECT text FROM ".$table_name." WHERE name='".$profile_name."'", ARRAY_N );
+			if($existing_data[0]):
+				$profile 			= unserialize($existing_data[0]);
+			else :
+				echo "<script>console.log('Network Nanny could not find a profile. Log in and save one to enable compiling.');</script>";
+				return;
+			endif;
+		else :
+			echo "<script>console.log('Network Nanny could not find a profile. Log in and save one to enable compiling.');</script>";
+			return;
+		endif;
+		
+		
+		// get current dependencies
+		foreach($wp_scripts->registered as $script){
+			if(in_array($script->handle, $wp_scripts->queue)){
+				$in_footer 			= false;
+				if(in_array($script->handle, $wp_scripts->in_footer)){
+					$in_footer 			= true;
+				}
+				if(count($script->deps) > 0){
+					foreach ($script->deps as $dep) {
+						if(!in_array($dep, $scripts_stash_handle)){
+							$scripts_stash_handle[]			= $dep;
+						}
+					}
+				}
+				
+				// wp_dequeue_script($script->handle);
+				$script->in_footer 		= $in_footer;
+				// save handle in array to make searching easier
+				$scripts_stash_handle[] = $script->handle;
+				$scripts_stash[] 		= $script;
+			}
+		}
+
+		foreach($profile as $sorted_script){
+			$handle 			= $sorted_script['handle'];
+			if(in_array($handle, $scripts_stash_handle) && $sorted_script['src'] != 'false'){
+				
+				foreach($scripts_stash as $s){
+					if($s->handle === $handle){
+						array_push($scripts_stash_final, $s);
+					}
+				}
+
+				if (($key = array_search($handle, $scripts_stash_handle)) !== false) {
+					unset($scripts_stash_handle[$key]);
+				}
+			}
+		}
+
+		foreach($scripts_stash as $script){
+			if(in_array($script->handle, $scripts_stash_handle) && count($script->deps)===0 && $script->src !==''){
+				array_push($scripts_stash_final, $script);
+				if (($key = array_search($script->handle, $scripts_stash_handle)) !== false) {
+					unset($scripts_stash_handle[$key]);
+				}
+			}
+		}
+		$baseUrl 		= isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http' . ':\/\/' . $_SERVER['SERVER_NAME'];
+		$reqs 			= array();
+		foreach($scripts_stash_final as $script){
+			$handle 			= $script->handle;
+			$src 				= $script->src;
+			wp_dequeue_script($handle);
+			if(preg_match("/^(".$baseUrl.").*/i", $src)){
+				$src = preg_replace("/^(".$baseUrl.")/i", '', $src);
+			};
+			array_push($reqs, $src);
+		}
+		$plugin_dir = ABSPATH . 'wp-content/plugins/Network-Nanny/';
+		$appJs 		= $plugin_dir.'public/js/app.js';
+		
+		if($resource = fopen($appJs, 'w')){
+			$string 			= "/*
+*
+* do not modify this file.  content is auto generated.
+* 
+*
+* 
+* end comment */";
+			foreach($reqs as $req){
+				$string.="require('../../../../..".$req."');";
+			}
+			if(fwrite($resource,$string)){
+				if(fclose($resource)){
+					exec ('export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin; /Users/clinton/Sites/wordpress/wp-content/plugins/plugin-name/node_modules/.bin/webpack --config /Users/clinton/Sites/wordpress/wp-content/plugins/plugin-name/webpack.config.js ', $ret);
+
+					echo "<pre>";
+					print_r($ret);
+					echo "</pre>";
+
+					wp_enqueue_script( 'webpack-bundle', plugin_dir_url( __FILE__ ).'/js/dist/bundle.js', array(), false, false );
+				}else{
+					echo "no close";
+					return false;
+				}
+			}else{
+				echo "no write";
+				return false;
+			}
+		}else{
+			return false;
+		}
+
+		// var_dump($scripts_stash_final);
+		// /Users/clinton/Sites/wordpress/wp-content/plugins/plugin-name/node_modules/.bin/webpack
+		// 
+		//				                  /usr/bin:/bin:/usr/sbin:/sbin
+		// exec('echo $PATH', $path);
+		// echo "<pre>";
+		// print_r($path);
+		// echo "</pre>";			                  
+		
+		// exec ('export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin; /Users/clinton/Sites/wordpress/wp-content/plugins/plugin-name/node_modules/.bin/webpack --config /Users/clinton/Sites/wordpress/wp-content/plugins/plugin-name/webpack.config.js ', $ret);
+		
+		// echo "<pre>";
+		// print_r($ret);
+		// echo "</pre>";
+
+		// echo plugin_dir_url( __FILE__ );
+
+		// wp_enqueue_script( 'webpack-bundle', plugin_dir_url( __FILE__ ).'/js/dist/bundle.js', array(), false, false );
 	}
 
 }
