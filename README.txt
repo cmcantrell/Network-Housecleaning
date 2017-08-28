@@ -21,6 +21,9 @@ Go to Settings > Network Nanny, click "Compile".
 This will begin generating a dependency profile and may take a few minutes depending on the amount of scripts your site requires.
 Once the profile is complete, the display will print out the list.  Hit "Save Profile".  Your site will now dynamically compile JS scripts into a Webpack bundle.js file.  You can monitor output in Network-Nanny/logs/runtime.log.  A list of files compiled will be available along with any errors.
 
+A few caveats:
+Several directories and files must be writable by the server.  Network-Nanny/logs/runtime.log, Network-Nanny/public/js/dist and Network-Nanny/public/js/app.js all must be writable for this plugin to work.
+
 == Frequently Asked Questions ==
 
 = It's not compiling all of my scripts? =
