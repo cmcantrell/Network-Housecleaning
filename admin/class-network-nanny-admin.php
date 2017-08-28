@@ -223,11 +223,11 @@ class Network_Nanny_Admin {
 			array($this,'network_nanny_js_toggle_callback'),	// callback function
 			'network-nanny',									// page
 			'network-nanny-js-section',							// section identifier
-			[
+			array(
 				'label_for'					=> 'network_nanny_js_toggle',
 				'class'             		=> 'network-nanny-row',
 				'network-nanny-custom-data' => 'custom',
-			]													// args
+			)													// args
 		);
 		
 		add_settings_field(
@@ -236,10 +236,10 @@ class Network_Nanny_Admin {
 			array($this,'network_nanny_js_compile_callback'),	// callback function
 			'network-nanny',									// page
 			'network-nanny-js-section',							// section identifier
-			[
+			array(
 				'label_for'					=> 'network_nanny_js_compile',
 				'class'             		=> 'network-nanny-row'
-			]													// args
+			)												// args
 		);
 		
 		add_settings_field(
@@ -248,10 +248,10 @@ class Network_Nanny_Admin {
 			array($this,'network_nanny_js_compile_ui_callback'),	// callback function
 			'network-nanny',									// page
 			'network-nanny-js-section',							// section identifier
-			[
+			array(
 				'label_for'					=> 'network_nanny_js_compile_ui',
 				'class'             		=> 'network-nanny-row'
-			]													// args
+			)													// args
 		);
 	}
 
