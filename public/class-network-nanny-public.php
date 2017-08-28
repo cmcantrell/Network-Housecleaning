@@ -206,7 +206,6 @@ class Network_Nanny_Public {
 			}				
 		}
 		
-		
 		if($resource = fopen($appJs, 'w')){
 			$string 			= "/*
 *
@@ -223,32 +222,43 @@ class Network_Nanny_Public {
 				if(fclose($resource)){
 					exec('echo $PATH', $path);
 					$path 				= $path[0];
-					exec('export PATH=/usr/local/bin:'.$path.'; /Users/clinton/Sites/wordpress/wp-content/plugins/Network-Nanny/node_modules/.bin/webpack --config /Users/clinton/Sites/wordpress/wp-content/plugins/Network-Nanny/webpack.config.js', $ret);
-					
-					if($errorLog = fopen($plugin_dir . 'logs/runtime.log', 'a')){
-						if(filesize($plugin_dir . 'logs/runtime.log') > 1000000000){
-							ftruncate($errorLog, 0);
-							fwrite($errorLog, date('Y-m-d H:i:s ') . PHP_EOL . 'File truncated' . PHP_EOL);
-						}
-						$log_data 		= date('Y-m-d H:i:s ') . PHP_EOL;
-						$log_data 		.= 'export PATH=/usr/local/bin:'.$path.'; /Users/clinton/Sites/wordpress/wp-content/plugins/Network-Nanny/node_modules/.bin/webpack --config /Users/clinton/Sites/wordpress/wp-content/plugins/Network-Nanny/webpack.config.js' . PHP_EOL;
-						$log_data 		.= print_r($ret, true);
-						fwrite($errorLog, $log_data);
-						fclose($errorLog);
-					}
+					$cmd 				= 'export PATH=/usr/local/bin:'.$path.'; '.$plugin_dir.'node_modules/.bin/webpack --config '.$plugin_dir.'webpack.config.js';
+					exec($cmd, $ret);
+					$log_data 		= date('Y-m-d H:i:s ') . PHP_EOL;
+					$log_data 		.= $cmd . PHP_EOL;
+					$log_data 		.= print_r($ret, true);
+					$this->writeLog($log_data);
 
 					wp_enqueue_script( 'webpack-bundle', plugin_dir_url( __FILE__ ).'/js/dist/bundle.js', array(), false, false );
 				}else{
-					echo "no close";
 					return false;
 				}
 			}else{
-				echo "no write";
+				$this->writeLog('could not write Network-Nanny/public/js/app.js');
 				return false;
 			}
 		}else{
+			$this->writeLog('could not open Network-Nanny/public/js/app.js');
 			return false;
 		}
+	}
+	
+	private function writeLog($string=false){
+		if(!$string){
+			return false;
+		}
+		$plugin_dir 	= ABSPATH . 'wp-content/plugins/Network-Nanny/';
+		if($errorLog = fopen($plugin_dir . 'logs/runtime.log', 'a')){
+			if(filesize($plugin_dir . 'logs/runtime.log') > 1000000000){
+				ftruncate($errorLog, 0);
+				fwrite($errorLog, date('Y-m-d H:i:s ') . PHP_EOL . 'File truncated' . PHP_EOL);
+			}
+			$log_data 		= date('Y-m-d H:i:s ') . PHP_EOL;
+			$log_data		.= $string . PHP_EOL;
+			fwrite($errorLog, $log_data);
+			fclose($errorLog);
+		}
+		return true;
 	}
 
 }
