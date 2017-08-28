@@ -32,6 +32,7 @@ This plugin only handles non-core files.  Many files are skipped over due to iss
 Check the error log first, details might be there: Network-Nanny/logs/runtime.log.  If the log file is empty or doesn't exist, check your file permissions.  Network-Nanny/logs/runtime.log, Network-Nanny/public/js/dist and Network-Nanny/public/js/app.js all must be writable to the server for the plugin to work correctly.
 
 = Where do I find help? =
+
 https://github.com/cmcantrell/Network-Nanny/issues
 
 == Changelog ==
